@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if intersection %}
+
+Query co-regulated gene analysis result: </br>
+{% for inter in intersection %}
+	{{ inter }} </br>
+{% endfor %}
+
+{% elif candidates %}
+Query candidate genes result: </br>
+
+{% for candidate in candidates %}
+	{{ candidate }} </br>
+{% endfor %}
+
+{% else %}
+
+{% if form.errors %}
+        {{ form.errors }}
+{% endif %}
+<div id = "co_regulation">
+<h1> Co-regulated genes analysis</h1>
+<form action="investigation" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+		<div>
+		Experiment:{{ form.exp }}
+		-logP threshold: {{ form.thld }}
+		QTL/marker: {{ form.marker }}	</div>
+		<div>
+		compare with your gene list: {{ form.gene_list }}
+		or a file contains: {{ form.gene_list_file }} </div>
+			
+		<input type="submit" id="regulation_submit" value="compare" />
+		
+</form>
+</div>
+</br></br></br></br></br></br>
+<div id = "candidate_genes">
+<h1> Candidate genes selection</h1>
+<form action="investigation" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+		<div>Experiment:{{ form.exp }}</div>
+		
+		<div>
+		Genome region (i.e.chr2:10000-20000 or 2:10000-20000): {{ form1.region }}</div>
+		<div>
+		compare with your gene list: {{ form1.qtl_gene_list }}
+		or a file contains: {{ form1.qtl_gene_list_file }} </div>
+			
+		<input type="submit" id="candidates_submit" value="compare" />
+		
+</form>
+</div>
+{% endif %}
+
+{% endblock %}

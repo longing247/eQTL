@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block head %}Sign up{% endblock %}
+{% block content %}
+{% load staticfiles %}
+	    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=PT+Sans:400,700'>
+        <link rel="stylesheet" href="{% static 'upload/css/upload.css' %}">
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+		
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" >
+    $(document).ready(function(){
+        $("#id_experiment").attr('placeholder', '{{form.experiment.label}}');
+        $("#id_parent").attr('placeholder', '{{form.parent.label}}');
+        $("#id_ref").attr('placeholder', '{{form.ref.label}}');
+        $("#id_pubmed").attr('placeholder', '{{form.pubmed.label}}');
+    });
+	</script>
+
+    {% if form.errors %}
+        {{ form.errors }}
+    {% endif %}
+     <div class="page-container">
+     	<div>
+            <h1>Upload</h1>
+            <form action="." method="post" enctype="multipart/form-data">{% csrf_token %}
+                Speices: {{ form.species }}
+                {{ form.experiment }}
+                {{ form.parent }}
+                {{ form.ref }}
+                {{ form.pubmed }}
+                <div class="upload">Array file: {{ form.arrayfile }}</div>
+                <div class="upload">Marker file: {{ form.markerfile }}</div>
+                <div class="upload">Genotype file: {{ form.genotypefile }}</div>
+                <div class="upload">Lod file: {{ form.lodfile }}</div>
+                <button type="submit">Sign up</button>
+            </form>
+        </div>
+     </div>
+{% endblock %}

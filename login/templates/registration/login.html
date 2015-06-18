@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block head %}Login{% endblock %}
+{% block content %}
+{% load staticfiles %}
+	    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=PT+Sans:400,700'>
+        <link rel="stylesheet" href="{% static 'login/css/style.css' %}">
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+		
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" >
+    $(document).ready(function(){
+        $("#id_username").attr('placeholder', '{{form.username.label}}');
+        $("#id_password").attr('placeholder', '{{form.password.label}}');
+    });
+</script>
+
+    {% if form.errors %}
+        <p>Your email and password didn't match. Please try again.</p>
+    {% endif %}
+     <div class="page-container">
+     	<div>
+            <h1>Login</h1>
+            <form action="." method="post">{% csrf_token %}
+                {{ form.username }}
+                {{ form.password }}
+                <button type="submit">Login</button>
+                <input type="hidden" name="next" value="/" />
+            </form>
+        </div>
+        <div style="text-align:center">
+            <a href="/register" style="font-size: 18px;font-family:'PT Sans', Helvetica, Arial, sans-serif;color:#fff;">Forgot password?</a>
+            
+        </div>
+     </div>
+
+{% endblock %}

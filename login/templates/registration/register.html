@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block head %}Sign up{% endblock %}
+{% block content %}
+{% load staticfiles %}
+	    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=PT+Sans:400,700'>
+        <link rel="stylesheet" href="{% static 'login/css/style.css' %}">
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+		
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" >
+    $(document).ready(function(){
+        $("#id_first_name").attr('placeholder', '{{form.first_name.label}}');
+        $("#id_last_name").attr('placeholder', '{{form.last_name.label}}');
+        $("#id_email").attr('placeholder', '{{form.email.label}}');
+        $("#id_password1").attr('placeholder', '{{form.password1.label}}');
+        $("#id_password2").attr('placeholder', '{{form.password2.label}}');
+    });
+	</script>
+
+    {% if form.errors %}
+        {{ form.errors }}
+    {% endif %}
+     <div class="page-container">
+     	<div>
+            <h1>Sign up</h1>
+            <form action="." method="post">{% csrf_token %}
+                {{ form.first_name }}
+                {{ form.last_name }}
+                {{ form.email }}
+                {{ form.password1 }}
+                {{ form.password2 }}
+                <button type="submit">Sign up</button>
+            </form>
+        </div>
+        <div style="text-align:center">
+            <a href="/login" style="font-size: 18px;font-family:'PT Sans', Helvetica, Arial, sans-serif;color:#fff;">Already have an account?</a>
+            
+        </div>
+     </div>
+{% endblock %}
