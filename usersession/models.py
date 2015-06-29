@@ -1,12 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from upload.models import Experiment,ArraySpot,Transcript,Marker
 # Create your models here.
 class Task(models.Model):
     user_name = models.ForeignKey(User)
-    
-    types = (
-        ('Co-regulation', 'co-regulated genes'),
-        ('candidates', 'candidate genes'),
-    )
-    analysis_type =  models.CharField(max_length=20, choices=types)
-    info = models.TextField()
+    experiment = models.ForeignKey(Experiment)
+    probe = models.ForeignKey(ArraySpot)
+    transcript =models.ForeignKey(Transcript)
+    marker = models.ForeignKey(Marker)
+    lod_si = models.CharField(max_length = 50)

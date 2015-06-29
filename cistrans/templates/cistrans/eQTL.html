@@ -2,7 +2,7 @@
 
 {% block content %}
 
-{% if selected_spot and experiment_name %}
+{% if experiment_name %}
 
 {% load staticfiles %}
 
@@ -10,32 +10,80 @@
 <script type="text/javascript" src="{% static 'cistrans/js/d3.js' %}"></script>
 <script type="text/javascript" src="{% static 'cistrans/js/d3.tip.old.js' %}"></script>
 
+<style>
+.select_btn{
+	background:url("{% static 'cistrans/image/select.png' %}");
+	background-color: transparent; 
+    background-repeat: no-repeat;  
+    border: none;           
+    cursor: pointer;
+    width:16px;      
+    height: 16px;          
+}
+.delete_btn{
+	background:url("{% static 'cistrans/image/delete.png' %}");
+	background-color: transparent; 
+    background-repeat: no-repeat;   
+    border: none;           
+    cursor: pointer;
+	width:16px;     
+    height: 16px;          
+
+}
+
+</style>
+
+<form action="cistrans" method="get">
+	Experiment name:
+		<select id = "experiment_name" name = "experiment_name">
+			{% for experiment in experiments %}
+				<option value =  "{{ experiment }}">{{ experiment }}</option>
+			{% endfor %}
+		</select>
+		<input type="submit" id="cistrans_submit" value="cistrans plot" />
+		
+</form>
 
 <p id="loading">[Loading...]</p>
 
 <div id = "container">
-<div id ="cistrans"></div>
+	<div id ="cistrans"></div>
 
-<div id = "qtltip">
-	QTL info:
-	<div id = "info">
-	test
-	</div>
+	<div id = "qtltip">
+		<h2>QTL info:</h2>
+		<form method="post" action="cistrans" id="post-form">
+		{% csrf_token %}
+			<div id = "this_experiment">Experiment:{{ experiment_name }}</div>
+			<input type="hidden" id="QTL" name="QTL">
+			<div id = "probe"></div>
+			<div id = "transcript"></div>
+			<div id = "marker"></div>
+			<div id = "lod"></div>
+			<div id = "lod_si"></div>
+			<div id = "addButton"></div>
+		</form>
+		<div id="results"></div>
 </div>
 
-<div id = "user_session">User session</div>
+<div id = "user_session">
+	<h2>User session</h2>
+	<div id="task"></div> 
+</div>
 
 <div id ="clear"></div>
 </div>
 <script type="text/javascript">
+
+
 (function() {
+
 	var draw;
 	draw = function(data) {
 	var Zscale, allgenes, altpink, axislabels, bigRad, bottom, c, checkerboard, checkerboard2, chrGap, chrLowXScale, chrXScale, chrYScale, chrindex, ci, cj, cur, curXPixel, curYPixel, darkGray, darkblue, darkgreen, darkred, draw_probe, efftip, eqtltip, fasttime, g, gene, h, i, indtip, j, jitter, jitterAmount, labelcolor, left, lightGray, m, maincolor, martip, maxlod, newg, nodig, onedig, origGeneName, p, pad, peakRad, peaks, pink, probe, probesByGene, purple, right, slowtime, svg, tickHeight, titlecolor, top, totalChrLength, totalh, totalw, twodig, w, xloc, yloc, _i, _j, _k, _l, _len, _len1, _len10, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _ref, _ref1, _ref10, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9, _s;
 	d3.select("p#loading").remove();
 	
 	totalw = 900;
-	totalh = 800;
+	totalh = 900;
 	chrGap = 8;
 	peakRad = 2;
 	bigRad = 5;
@@ -387,7 +435,12 @@
         return Zscale(d.lod);
       }).on("mouseover", function(d) {
         d3.selectAll("circle.probe_" + d.spot).attr("r", bigRad).attr("fill", pink).attr("stroke", darkblue).attr("stroke-width", 1).attr("opacity", 1);
-        d3.select("#info").text("Probe: "+d.spot+"\r\n"+"Transcript: "+d.transcript+"\r\n"+" ref:"+d.ref+"\r\n"+" Marker: "+d.marker+"\r\n"+" LOD: " +d.lod+"\r\n"+ " 1-LOD support interval: "+d.interval+"\r\n");
+        d3.select("#probe").html("Probe:"+d.spot);
+        d3.select("#transcript").html("Transcript:"+d.transcript);
+        d3.select("#marker").html("Marker:"+d.marker);
+        d3.select("#lod").html("LOD:"+onedig(d.lod));
+        d3.select("#lod_si").html("1-lod-si:"+d.interval);
+        d3.select("#addButton").html("<button onclick='addQTL()'>QTL analysis</button>");
         return eqtltip.call(this, d);
       }).on("mouseout", function(d) {
         d3.selectAll("circle.probe_" + d.spot).attr("r", peakRad).attr("fill", function(d) {
@@ -409,6 +462,9 @@
   
 
 </script>
+<script type="text/javascript" src="{% static 'cistrans/js/session.js' %}"></script>
+
+
 {% else %}
 
 <form action="cistrans" method="get">

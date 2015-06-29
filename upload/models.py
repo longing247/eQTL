@@ -105,6 +105,7 @@ class Transcript(models.Model):
     def __unicode__(self):
         return self.transcript_name
     
+
 #class GO (models.Model):
 #    gene_name = models.ForeignKey(Gene)  
 #    molecular_function = models.CharField(max_length = 200,blank=True)

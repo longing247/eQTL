@@ -49,12 +49,8 @@ $.ajaxSetup({
     }
 });
 
-function addCoReg(){
-	var co_reg = d3.select("#this_experiment").text()+" "+d3.select("#probe").text()+" "+d3.select("#marker").text()+" ";
-	$("#coReg").val(co_reg);
-}
 function addQTL(){
-	var qtl_info = d3.select("#this_experiment").text()+" "+d3.select("#marker").text()+" "+d3.select("#lod_si").text()+" ";
+	var qtl_info = d3.select("#this_experiment").text()+" "+d3.select("#probe").text()+" "+d3.select("#transcript").text()+" "+d3.select("#marker").text()+" "+d3.select("#lod_si").text();
 	$("#QTL").val(qtl_info)
 }
 
@@ -70,12 +66,27 @@ function create_session(){
     $.ajax({
         url : "cistrans", // the endpoint
         type : "POST", // http method
-        data : { coReg : $('#coReg').val(),QTL:$('#coReg').val() }, // data sent with the post request
+        data : {QTL:$('#QTL').val() }, // data sent with the post request
 
         // handle a successful response
         success : function(json) {
-            $('#coReg').val(''); // remove the value from the input
-            $('#coQTL').val(''); // remove the value from the input
+        	for(var i=0;i<json.length;i++){
+      			$('#task').append("<div class='task_ins'><p>task_id:"+json[i][0]+" experiment:"+json[i][1]+" probe:"+json[i][2]+" marker:"+json[i][3]+"<input type='button' class='select_btn' /><input type='button' class='delete_btn' /></p>");
+        	}
+        	$('.task_ins').each(function() {
+        		   var html_ins = $(this).find("p").text();
+        		   var ind_1 = html_ins.indexOf(":")+1;
+        		   var ind_2 = html_ins.indexOf(" ");
+        		   var id_ins = html_ins.slice(ind_1,ind_2);
+        		   //console.log(id_ins);
+        		   var task_pre = "task-";
+        		   $(this).attr('id', id_ins);
+        		   var del_btn_pre = "del-btn-";
+        		   $(this).find(".delete_btn").attr('id',del_btn_pre+id_ins);
+        		   var sel_btn_pre = "sel-btn-";
+        		   $(this).find(".select_btn").attr('id',sel_btn_pre+id_ins);
+        	});
+        	
             console.log(json); // log the returned json to the console
             console.log("success"); // another sanity check
         },

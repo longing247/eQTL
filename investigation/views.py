@@ -66,7 +66,6 @@ def investigationView(request):
                     target_gene_list = content.strip().split(delimiter_type)
 
                     inter = intersect(gene_list,target_gene_list)
-                    print inter
                     return render(request,'investigation/investigation.html',{'intersection':inter})
                 
     elif request.POST.get('region') and request.POST.get('exp'):

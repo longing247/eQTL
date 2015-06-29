@@ -39,7 +39,9 @@ INSTALLED_APPS = (
     'login', 
     'upload',
     'cistrans',
-    'investigation'
+    'investigation',
+    'usersession',
+    'south'
 )
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
