@@ -36,8 +36,17 @@ class investigationForm(forms.Form):
     gene_list = forms.CharField(widget=forms.TextInput(attrs={}),required=False)
     gene_list_file = forms.FileField(widget=forms.FileInput(attrs={'class':'file'}),required=False)
 
+class investigationTaskForm(forms.Form):   
+    thld = forms.RegexField(regex=r'^[1-9]\d*(\.\d+)?$', widget=forms.TextInput(attrs=dict(required=True, max_length=5)), label=_("-logP"), error_messages={ 'invalid': _("Invalid threshold") })
+    gene_list = forms.CharField(widget=forms.TextInput(attrs={}),required=False)
+    gene_list_file = forms.FileField(widget=forms.FileInput(attrs={'class':'file'}),required=False)
+
 class investigationQTLForm(forms.Form):
     exp = forms.CharField(widget = forms.Select(choices = getExp()))
     region = forms.RegexField(regex=r'^(chr|)*\s*([0-9]{1,2}|X|CP|MT)\s*(:)?\s*(\d+)\s*(-)?\s*(\d+)\s*', widget=forms.TextInput(attrs=dict(required=True, max_length=12)), label=_("Chromosome region"), error_messages={ 'invalid': _("Invalid chromsome region")})
+    qtl_gene_list = forms.CharField(widget=forms.TextInput(attrs={}),required=False)
+    qtl_gene_list_file = forms.FileField(widget=forms.FileInput(attrs={'class':'file'}),required=False)
+
+class investigationQTLTaskForm(forms.Form):
     qtl_gene_list = forms.CharField(widget=forms.TextInput(attrs={}),required=False)
     qtl_gene_list_file = forms.FileField(widget=forms.FileInput(attrs={'class':'file'}),required=False)

@@ -7,12 +7,7 @@
 <link rel="stylesheet" href="{% static 'cistrans/css/jquery-ui.min.css' %}" type="text/css"/>
 <script type="text/javascript" src="{% static 'cistrans/js/jquery.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'cistrans/js/jquery-ui.min.js' %}"></script>
-<script>
-//$(function(){
-//	$( document ).tooltip();
-//});
-</script>
-<title>Arabidopsis Thaliana QTL database</title>
+<title>eQTL visualization and investigation</title>
 </head>
 <body>
 
@@ -32,10 +27,8 @@
 
 
 <div>
-	{% if user.first_name  %}
-		<p>Welcome {{ user.first_name }}</p>
-	{% endif %}
-	<div id = "user" style= "position:fixed;right:100px;">
+	<div id="logo" style="width:226px;height:35px;float:left;"><img src="{% static 'cistrans/image/wur.png' %}" style="max-width:100%;max-height:100%;"></div>
+	<div id = "user" style= "position:absolute;right:100px;display:inline-block;float:left;">
 		<a href="../register/" style="font-size: 18px;font-family:'PT Sans', Helvetica, Arial, sans-serif;color:#fff;">Register</a>
 		{% if user.username %}
 			<a href="../logout/" style="font-size: 18px;font-family:'PT Sans', Helvetica, Arial, sans-serif;color:#fff;" >Log out</a>
@@ -46,10 +39,9 @@
 </div>
 <nav><ul>
 <li> <a href = "../about/">About</a></li>
-<li> <a href = "../documentation/">Doc</a></li>
-<li> <a href = "../gene/">Genes</a></li>
-<li> <a href = "../marker/">Markers</a></li>
-<li> <a href = "../metabolite/">Metabolite</a></li>
+<li> <a href = "../documentation/">Documentation</a></li>
+<li> <a href = "../visualization/">Visualization</a></li>
+<li> <a href = "../investigation">Investigation</a></li>
 <li> <a href = "../upload/">Upload</a></li>
 </ul></nav>
 
@@ -67,17 +59,6 @@
 </div>
 
 {% block content %} {% endblock %}
-
-<!-- 
-<footer>
-<p>WU - Laboratory of Bioinformatics (Leerstoelgroep Bioinformatica)</p>
-<p>Address: Radix, Droevendaalsesteeg 1, 6708 PB, WAGENINGEN, The Netherlands (Wageningen UR building no. 107) Correnspondence: P.O. Box 569, 6700 AN Wageningen</p>
-<p>Tel: +31 317 482036 Fax: + 31 317 418094</p> 
-<p>Education contact person: <a href = "harm.nijveen@wur.nl"> dr. H (Harm) Nijveen </a></p>
-<p>Chair holder: <a href = "dick.deridder@wur.nl"> prof.dr.ir. Dick de Ridder </a></p>
-<p>For information on the chairgroup and its activities please visit our <a href = "http://www.wageningenur.nl/nl/Expertises-Dienstverlening/Leerstoelgroepen/Plantenwetenschappen/Bioinformatica.htm">website</a> at Wageningen University.</p>
-</footer>
--->
 </body>
 </html>
 

@@ -2,10 +2,12 @@ import json
 
 from django.shortcuts import render,render_to_response,HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from upload.models import ArraySpot,Experiment,Transcript,Marker
 from usersession.models import Task
 # Create your views here.
+@login_required(login_url="/login/")
 def eQTLPlotView(request):
     '''
     plot eQTL maping
@@ -15,14 +17,21 @@ def eQTLPlotView(request):
     if request.method=='GET':
         if request.GET.get('experiment_name'):
             exp_name = request.GET.get('experiment_name')
-        
+            user_ = User.objects.get(username = request.user)
+            user_tasks = Task.objects.filter(user_name=user_).values('id','experiment','probe','marker')
+
             return render_to_response('cistrans/eQTL.html',{'experiment_name': exp_name,
-                                                            'experiments':experiments})
+                                                            'experiments':experiments,
+                                                            'task_list':user_tasks,
+                                                            'user':request.user})
         else:
-            return render_to_response('cistrans/eQTL.html',{'experiments':experiments})                                 
+            user_ = User.objects.get(username = request.user)
+            user_tasks = Task.objects.filter(user_name=user_).values('id','experiment','probe','marker')         
+            return render_to_response('cistrans/eQTL.html',{'experiments':experiments,
+                                                            'task_list':user_tasks,
+                                                            'user':request.user})                                 
     
     elif request.method=='POST':
-        print '111'
         if request.POST.get('QTL'):
             post_text = request.POST.get('QTL')
             ins = post_text.split(' ')
@@ -50,3 +59,15 @@ def eQTLPlotView(request):
                 task_list.append((str(id),exp.encode('ascii','ignore'),spot_id,marker_name))
             return HttpResponse(json.dumps(task_list),content_type="application/json")
         
+        if request.POST.get('del_task'):
+            post_text = request.POST.get('del_task')
+            task = Task.objects.get(user_name = request.user,id=post_text).delete()
+            user_ = User.objects.get(username = request.user)
+            user_tasks = Task.objects.filter(user_name=user_).values_list('id','experiment','probe','marker')         
+            task_list = []
+            for id,exp,probe,mark in user_tasks:
+                spot_id = ArraySpot.objects.get(id=probe).spot_id.encode('ascii','ignore')
+                marker_name = Marker.objects.get(id = mark).marker_name.encode('ascii','ignore')
+                task_list.append((str(id),exp.encode('ascii','ignore'),spot_id,marker_name))
+            
+            return HttpResponse(json.dumps(task_list),content_type="application/json")

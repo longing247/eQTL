@@ -1,13 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'investigation/css/investigation.css' %}" type="text/css"/>
 {% if intersection %}
-
-Query co-regulated gene analysis result: </br>
-{% for inter in intersection %}
-	{{ inter }} </br>
-{% endfor %}
-
+<div id="container">
+	<div id = "overlap">
+	Number of overlaps: {{ intersection|length}}</br>
+	{% for inter in intersection %}
+		{{ inter }},
+	{% endfor %}
+	</div>
+	</br>
+	<div id ="target">
+	{% if target_QTL_ins %}
+		<div class = "target_sub">
+	    	Co-regulated genes for target_QTL: {{ target_QTL_ins.id }} Experiment:{{ target_QTL_ins.exp }} Transcript: {{ target_QTL_ins.target_transcript }} Reference id: {{ target_QTL_ins.target_ref }} Marker: {{ target_QTL_ins.target_marker }} 1-LOD support interval: {{ target_QTL_ins.target_lod_si }}</br>
+			Number of co-regulated genes for target_QTL: {{ target_QTL_ins.target_trans_list|length }}</br>
+			<div>
+			{% for gene in target_QTL_ins.target_trans_list %}
+				{{ gene }},
+			{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+	</div>
+	</br>
+	<div id = "Query">
+	{% if query_QTL_ins_list %}
+		{% for query_QTL_ins in query_QTL_ins_list %}
+			<div class="query_sub">
+			Co-regulated genes for query_QTL:{{ query_QTL_ins.id }} Experiment: {{query_QTL_ins.exp}} Transcript: {{ query_QTL_ins.query_transcript }} Reference id: {{ query_QTL_ins.query_ref }} Marker: {{ query_QTL_ins.query_marker }} 1-LOD support interval: {{ query_QTL_ins.query_lod_si }}</br>
+			Number of co_regulated genes for query_QTL: {{ query_QTL_ins.query_trans_list|length }}</br>
+			<div>
+			{% for gene in query_QTL_ins.query_trans_list %}
+				{{ gene }},
+			{% endfor %}
+			</div>
+			</div>	
+		{% endfor %}
+	{% endif %}
+	</div>
+</div>	
 {% elif candidates %}
 Query candidate genes result: </br>
 
@@ -17,42 +51,96 @@ Query candidate genes result: </br>
 
 {% else %}
 
+{% if tasks %}
+{% if form.errors %}
+        {{ form.errors }}
+{% endif %}
+
+<div id = 'invesigation'>
+<table>
+<tr><th>QTL id</th><th>Experiment</th><th>Probe</th><th>Transcript</th><th>Reference id</th><th>Marker</th><th>1 LOD support interval</th></tr>
+{% for task in tasks %}
+	<tr><td>{{ task.id }}</td><td>{{ task.experiment_id }}</td><td>{{ task.probe_id }}</td><td>{{ task.transcript_id }}</td><td>{{ task.ref_id }}</td><td>{{ task.marker_id }}</td><td>{{ task.lod_si }}</td></tr>
+{% endfor %}
+</table>
+</div>
+<div id = "co_regulation">
+<h1> Co-regulated genes analysis</h1>
+	<form action="" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<div class = 'co_regulation_sub'>
+			<h2> Target co-regulated gene list for a QTL</h2>
+			<div>Target QTL:<select class = "qtl_analysis" name = "target_sel_qtl">{% for task in tasks %}<option value =  "{{ task.id }}">QTL {{ task.id }}</option>{% endfor %}</select></div>
+			<div>-logP threshold:{{ form.thld }}</div>
+		</div>
+		<div class = 'co_regulation_sub'>
+			<h2> Query gene list</h2>
+			<div>Query QTL:
+			{% for task in tasks %}
+			<input type = "checkbox" name = "query_sel_qtl" value="{{ task.id }}">{{task.id}}
+			{% endfor %}
+			</div>
+			<div>or compare with your gene list: {{ form.gene_list }}</div>
+			<div>or a file contains: {{ form.gene_list_file }} </div>	
+		<input type="submit" id="regulation_submit" class="btn_analysis" value="co-regulation analysis" />
+		</div>
+	</form>
+</div>
+<div id = "candidate_genes">
+<h1> Candidate genes selection</h1>
+	<form action="" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<div class = 'candidates_sub'>
+			<h2> Target candidate gene list for a QTL</h2>
+			<div>Target QTL:<select class = "qtl_analysis" name = "sel_qtl">{% for task in tasks %}<option value =  "{{ task.id }}">QTL {{ task.id }}</option>{% endfor %}</select></div>
+		</div>
+		<div class = 'candidates_sub'>
+			<h2> Query gene list</h2>
+			<div>compare with your gene list: {{ form1.qtl_gene_list }}</div>
+			<div>or a file contains: {{ form1.qtl_gene_list_file }} </div>
+		</div>
+		<input type="submit" id="candidates_submit" class="btn_analysis" value="candidate genes selection" />
+		
+</form>
+</div>
+{% else %}
+
 {% if form.errors %}
         {{ form.errors }}
 {% endif %}
 <div id = "co_regulation">
 <h1> Co-regulated genes analysis</h1>
-<form action="investigation" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data">
 {% csrf_token %}
-		<div>
-		Experiment:{{ form.exp }}
-		-logP threshold: {{ form.thld }}
-		QTL/marker: {{ form.marker }}	</div>
-		<div>
-		compare with your gene list: {{ form.gene_list }}
-		or a file contains: {{ form.gene_list_file }} </div>
+		<div> Target gene list</div>
+		<div>Experiment:{{ form.exp }}</div>
+		<div>-logP threshold: {{ form.thld }}</div>
+		<div>QTL/marker: {{ form.marker }}</div>
+		<div> Query gene list</div>
+		<div>compare with your gene list: {{ form.gene_list }}</div>
+		<div>or a file contains: {{ form.gene_list_file }} </div>
 			
-		<input type="submit" id="regulation_submit" value="compare" />
+		<input type="submit" id="regulation_submit" class="btn_analysis" value="co-regulation analysis" />
 		
 </form>
 </div>
-</br></br></br></br></br></br>
 <div id = "candidate_genes">
 <h1> Candidate genes selection</h1>
-<form action="investigation" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data">
 {% csrf_token %}
+		<div> Target gene list</div>
 		<div>Experiment:{{ form.exp }}</div>
-		
-		<div>
-		Genome region (i.e.chr2:10000-20000 or 2:10000-20000): {{ form1.region }}</div>
-		<div>
-		compare with your gene list: {{ form1.qtl_gene_list }}
-		or a file contains: {{ form1.qtl_gene_list_file }} </div>
+		<div>Genome region (i.e.chr2:10000-20000 or 2:10000-20000): {{ form1.region }}</div>
+		<div> Query gene list</div>
+		<div>compare with your gene list: {{ form1.qtl_gene_list }}</div>
+		<div>or a file contains: {{ form1.qtl_gene_list_file }} </div>
 			
-		<input type="submit" id="candidates_submit" value="compare" />
+		<input type="submit" id="candidates_submit" class="btn_analysis" value="candidate genes selection" />
 		
 </form>
 </div>
+
+{% endif %}
 {% endif %}
 
 {% endblock %}

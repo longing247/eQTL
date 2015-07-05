@@ -41,6 +41,8 @@ INSTALLED_APPS = (
     'cistrans',
     'investigation',
     'usersession',
+    'about',
+    'documentation',
     'south'
 )
 
@@ -115,10 +117,10 @@ STATIC_URL = '/static/'
 
 
 # if a user is not logged in, then it will redirect the user to login page
-import django.contrib.auth
-django.contrib.auth.LOGIN_URL= '/'
-django.contrib.auth.LOGIN_REDIRECT_URL = '/qtl/'
-django.contrib.auth.LOGOUT_URL = '/qtl/'
+
+LOGIN_URL= '/login/'
+LOGIN_REDIRECT_URL = '/Documentation/'
+LOGOUT_URL = '/login/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
 

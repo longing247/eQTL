@@ -2,8 +2,6 @@
 
 {% block content %}
 
-{% if experiment_name %}
-
 {% load staticfiles %}
 
 <link rel="stylesheet" href="{% static 'cistrans/css/cistrans.css' %}" type="text/css"/>
@@ -11,36 +9,27 @@
 <script type="text/javascript" src="{% static 'cistrans/js/d3.tip.old.js' %}"></script>
 
 <style>
-.select_btn{
-	background:url("{% static 'cistrans/image/select.png' %}");
-	background-color: transparent; 
-    background-repeat: no-repeat;  
-    border: none;           
-    cursor: pointer;
-    width:16px;      
-    height: 16px;          
-}
 .delete_btn{
 	background:url("{% static 'cistrans/image/delete.png' %}");
 	background-color: transparent; 
     background-repeat: no-repeat;   
-    border: none;           
-    cursor: pointer;
+    border: none;          
 	width:16px;     
     height: 16px;          
 
 }
 
 </style>
+{% if experiment_name %}
 
-<form action="cistrans" method="get">
+<form action="" method="get">
 	Experiment name:
 		<select id = "experiment_name" name = "experiment_name">
 			{% for experiment in experiments %}
 				<option value =  "{{ experiment }}">{{ experiment }}</option>
 			{% endfor %}
 		</select>
-		<input type="submit" id="cistrans_submit" value="cistrans plot" />
+		<input type="submit" id="cistrans_submit" class = "btn_analysis" value="QTL plot" />
 		
 </form>
 
@@ -51,7 +40,7 @@
 
 	<div id = "qtltip">
 		<h2>QTL info:</h2>
-		<form method="post" action="cistrans" id="post-form">
+		<form method="post" action="" id="post-form">
 		{% csrf_token %}
 			<div id = "this_experiment">Experiment:{{ experiment_name }}</div>
 			<input type="hidden" id="QTL" name="QTL">
@@ -63,14 +52,47 @@
 			<div id = "addButton"></div>
 		</form>
 		<div id="results"></div>
-</div>
-
-<div id = "user_session">
-	<h2>User session</h2>
-	<div id="task"></div> 
-</div>
-
-<div id ="clear"></div>
+	</div>
+	{% if task_list %}
+	<div id = "user_session">
+		<h2>User session</h2>
+		<form method ='get' id='post_analysis_form' action='../investigation/'>
+		<div id="task">
+		{% for task in task_list %}
+			<div class='task_ins'>
+				
+				<p><input type='checkbox' name='QTL_list' class='selected_qtl' />QTL_id:{{ task.id }} experiment:{{ task.experiment }} probe:{{ task.probe }} marker:{{ task.marker}}
+					<input type='button' class='delete_btn' />
+				</p>
+			</div>
+		{% endfor %}
+		<button id = "qtl_analysis"  class = "btn_analysis">run QTL analysis</button>
+		</div> 
+		</form>
+	</div>
+	<script type="text/javascript">
+	jQuery(function(){
+		$('.task_ins').each(function() {
+			   var html_ins = $(this).find("p").text();
+			   var ind_1 = html_ins.indexOf(":")+1;
+			   var ind_2 = html_ins.indexOf(" ");
+			   var id_ins = html_ins.slice(ind_1,ind_2);
+			   //console.log(id_ins);
+			   var task_pre = "task-";
+			   $(this).attr('id', id_ins);
+			   var del_btn_pre = "del-btn-";
+			   $(this).find(".delete_btn").attr('id',del_btn_pre+id_ins);
+			   $(this).find(".selected_qtl").attr('value',id_ins);
+		});
+	});
+	</script>
+	{% else %}
+	<div id = "user_session">
+		<h2>User session</h2>
+		<div id="task"></div> 
+	</div>
+	{% endif %}
+	<div id ="clear"></div>
 </div>
 <script type="text/javascript">
 
@@ -440,7 +462,7 @@
         d3.select("#marker").html("Marker:"+d.marker);
         d3.select("#lod").html("LOD:"+onedig(d.lod));
         d3.select("#lod_si").html("1-lod-si:"+d.interval);
-        d3.select("#addButton").html("<button onclick='addQTL()'>QTL analysis</button>");
+        d3.select("#addButton").html("<button id='btn_analysis'  class = 'btn_analysis' onclick='addQTL()'>add to task</button>");
         return eqtltip.call(this, d);
       }).on("mouseout", function(d) {
         d3.selectAll("circle.probe_" + d.spot).attr("r", peakRad).attr("fill", function(d) {
@@ -454,10 +476,10 @@
         });
         return d3.selectAll("#eqtltip").remove();
       }).on("click", function(d) {
-          d3.json("media/data/{{ experiment_name }}/probe/" + d.spot + ".json", draw_plot);
+          d3.json("../media/data/{{ experiment_name }}/probe/" + d.spot + ".json", draw_plot);
         });
     };
-    d3.json("media/data/{{ experiment_name }}/lod.json", draw);
+    d3.json("../media/data/{{ experiment_name }}/lod.json", draw);
 }).call(this);
   
 
@@ -467,17 +489,59 @@
 
 {% else %}
 
-<form action="cistrans" method="get">
-	Experiment name:
-		<select id = "experiment_name" name = "experiment_name">
-			{% for experiment in experiments %}
-				<option value =  "{{ experiment }}">{{ experiment }}</option>
-			{% endfor %}
-		</select>
-		<input type="submit" id="cistrans_submit" value="cistrans plot" />
-		
-</form>
-
+	<form action="" method="get">
+		Experiment name:
+			<select id = "experiment_name" name = "experiment_name">
+				{% for experiment in experiments %}
+					<option value =  "{{ experiment }}">{{ experiment }}</option>
+				{% endfor %}
+			</select>
+			<input type="submit" id="cistrans_submit"  class = "btn_analysis" value="QTL plot" />
+			
+	</form>
+	<div id = "container">
+		{% if task_list %}
+		<div id = "user_session">
+			<h2>User session</h2>
+			<form method ='get' id='post_analysis_form' action='../investigation/'>
+			<div id="task">
+				{% for task in task_list %}
+				<div class='task_ins'>
+					<p><input type='checkbox' name='QTL_list' class='selected_qtl' />QTL_id:{{ task.id }} experiment:{{ task.experiment }} probe:{{ task.probe }} marker:{{ task.marker}}
+						<input type='button' class='delete_btn' />
+					</p>
+				</div>
+		   		{% endfor %}
+		   		<button id = "qtl_analysis"  class = "btn_analysis">run QTL analysis</button>
+			</div> 
+			</form>
+		</div>
+		{% else %}
+		<div id = "user_session">
+			<h2>User session</h2>
+			<div id="task"></div> 
+		</div>
+		{% endif %}
+		<div id ="clear"></div>
+	</div>
+	<script type="text/javascript">
+	jQuery(function(){
+		$('.task_ins').each(function() {
+			   var html_ins = $(this).find("p").text();
+			   var ind_1 = html_ins.indexOf(":")+1;
+			   var ind_2 = html_ins.indexOf(" ");
+			   var id_ins = html_ins.slice(ind_1,ind_2);
+			   //console.log(id_ins);
+			   var task_pre = "task-";
+			   $(this).attr('id', id_ins);
+			   var del_btn_pre = "del-btn-";
+			   $(this).find(".delete_btn").attr('id',del_btn_pre+id_ins);
+			   $(this).find(".selected_qtl").attr('value',id_ins);
+			   
+		});
+	});
+	</script>
+	<script type="text/javascript" src="{% static 'cistrans/js/session.js' %}"></script>
 {% endif %}
 
 {% endblock %}

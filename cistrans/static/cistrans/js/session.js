@@ -64,15 +64,17 @@ $('#post-form').on('submit', function(event){
 function create_session(){
     console.log("create session is working!") // sanity check
     $.ajax({
-        url : "cistrans", // the endpoint
+        url : "", // the endpoint
         type : "POST", // http method
         data : {QTL:$('#QTL').val() }, // data sent with the post request
-
+        cache: false,
         // handle a successful response
         success : function(json) {
+        	$('#task').html('');
         	for(var i=0;i<json.length;i++){
-      			$('#task').append("<div class='task_ins'><p>task_id:"+json[i][0]+" experiment:"+json[i][1]+" probe:"+json[i][2]+" marker:"+json[i][3]+"<input type='button' class='select_btn' /><input type='button' class='delete_btn' /></p>");
+      			$('#task').append("<div class='task_ins'><p><input type='checkbox' name='QTL_list' class='selected_qtl' />QTL_id:"+json[i][0]+" experiment:"+json[i][1]+" probe:"+json[i][2]+" marker:"+json[i][3]+"<input type='button' class='delete_btn' /></p></div>");
         	}
+        	$('#task').append('<button id = "qtl_analysis"  class = "btn_analysis">run QTL analysis</button>');
         	$('.task_ins').each(function() {
         		   var html_ins = $(this).find("p").text();
         		   var ind_1 = html_ins.indexOf(":")+1;
@@ -83,8 +85,7 @@ function create_session(){
         		   $(this).attr('id', id_ins);
         		   var del_btn_pre = "del-btn-";
         		   $(this).find(".delete_btn").attr('id',del_btn_pre+id_ins);
-        		   var sel_btn_pre = "sel-btn-";
-        		   $(this).find(".select_btn").attr('id',sel_btn_pre+id_ins);
+        		   $(this).find(".selected_qtl").attr('value',id_ins);
         	});
         	
             console.log(json); // log the returned json to the console
@@ -99,4 +100,45 @@ function create_session(){
         }
     });
 };
+$(function() {
+    $(document).on('click', '.delete_btn', function () {	
+    console.log("prepare to delete task");
+    var task_id = $(this).attr('id').slice(8);
+    $.ajax({
+        url : "", // the endpoint
+        type : "POST", // http method
+        data : {del_task:task_id }, // data sent with the post request
+        cache: false,
+        // handle a successful response
+        success : function(json) {
+        	$('#task').html('');
+        	for(var i=0;i<json.length;i++){
+      			$('#task').append("<div class='task_ins'><p><input type='checkbox' name='QTL_list'  class='selected_qtl' />QTL_id:"+json[i][0]+" experiment:"+json[i][1]+" probe:"+json[i][2]+" marker:"+json[i][3]+"<input type='button' class='delete_btn' /></p></div>");
+        	}
+        	$('#task').append('<button id = "qtl_analysis"  class = "btn_analysis">run QTL analysis</button>');
+        	$('.task_ins').each(function() {
+     		   var html_ins = $(this).find("p").text();
+     		   var ind_1 = html_ins.indexOf(":")+1;
+     		   var ind_2 = html_ins.indexOf(" ");
+     		   var id_ins = html_ins.slice(ind_1,ind_2);
+     		   //console.log(id_ins);
+     		   var task_pre = "task-";
+     		   $(this).attr('id', id_ins);
+     		   var del_btn_pre = "del-btn-";
+     		   $(this).find(".delete_btn").attr('id',del_btn_pre+id_ins);
+     		   $(this).find(".selected_qtl").attr('value',id_ins);
+     	});
+            console.log(json); // log the returned json to the console
+            console.log("success"); // another sanity check
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+    });
+});
 

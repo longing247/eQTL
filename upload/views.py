@@ -7,8 +7,8 @@ from experiment.Arabidopsis import Arabidopsis
 from experiment.Celegans import Celegans
  
 from django.shortcuts import render_to_response,HttpResponseRedirect,render
-#from django.views.decorators.csrf import csrf_protect
-#from django.core.context_processors import csrf
+from django.contrib.auth.decorators import login_required
+
 from django.template import RequestContext
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -18,6 +18,7 @@ from django.conf import settings
 from upload.models import Species,Experiment,Line,ArraySpot,Marker,Transcript
 from upload.forms import uploadForm
 
+@login_required(login_url="/login/")
 def uploadView(request):
     '''handle parsing file, and saving each entry to MySQL DB
     '''
