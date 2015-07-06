@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'usersession',
     'about',
     'documentation',
+    'go',
     'south'
 )
 

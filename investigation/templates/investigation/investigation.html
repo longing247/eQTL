@@ -3,44 +3,85 @@
 
 {% load staticfiles %}
 <link rel="stylesheet" href="{% static 'investigation/css/investigation.css' %}" type="text/css"/>
+<script type="text/javascript" src="{% static 'investigation/js/investigation.js' %}"></script>
 {% if intersection %}
 <div id="container">
+	<form method = "POST" action="../GO/">
+	{% csrf_token %}
+	<input type="hidden" id ="gene_list" name="gene_list" />
+	<input type="hidden" id = "exp" name = "exp" />
 	<div id = "overlap">
 	Number of overlaps: {{ intersection|length}}</br>
+	<div class="hiddenDiv" style="display:none;">{{target_QTL_ins.exp}}</div>
+	<div>
 	{% for inter in intersection %}
 		{{ inter }},
 	{% endfor %}
-	</div>
 	</br>
+	</div>
+	<div>
+	Multiple testing
+	<input type="checkbox" name = "multiple_testing" value ="bonferroni" >Bonferroni
+	<input type="checkbox" name = "multiple_testing" value ="sidak" >Sidak
+	<input type="checkbox" name = "multiple_testing" value ="holm" >Holm
+	<input type="checkbox" name = "multiple_testing" value ="fdr" >FDR
+	| control Family-wise alpha or False discovery rate at (e.g. 0.05)<input type = "text" name = "alpha" >
+	</div>
+	<button class = "go_analysis">GO enrichment analysis</button>
+	</div>
+	<br/>
 	<div id ="target">
 	{% if target_QTL_ins %}
 		<div class = "target_sub">
 	    	Co-regulated genes for target_QTL: {{ target_QTL_ins.id }} Experiment:{{ target_QTL_ins.exp }} Transcript: {{ target_QTL_ins.target_transcript }} Reference id: {{ target_QTL_ins.target_ref }} Marker: {{ target_QTL_ins.target_marker }} 1-LOD support interval: {{ target_QTL_ins.target_lod_si }}</br>
 			Number of co-regulated genes for target_QTL: {{ target_QTL_ins.target_trans_list|length }}</br>
+			<div class="hiddenDiv" style="display:none;">{{target_QTL_ins.exp}}</div>
 			<div>
 			{% for gene in target_QTL_ins.target_trans_list %}
 				{{ gene }},
 			{% endfor %}
+			<br />
 			</div>
+			<div>
+				Multiple testing
+				<input type="checkbox" name = "multiple_testing" value ="bonferroni" >Bonferroni
+				<input type="checkbox" name = "multiple_testing" value ="sidak" >Sidak
+				<input type="checkbox" name = "multiple_testing" value ="holm" >Holm
+				<input type="checkbox" name = "multiple_testing" value ="fdr" >FDR
+				| control Family-wise alpha or False discovery rate at (e.g. 0.05)<input type = "text" name = "alpha" >
+				</div>
+			<button class = "go_analysis">GO enrichment analysis</button>
 		</div>
 	{% endif %}
 	</div>
-	</br>
+	<br/>
 	<div id = "Query">
 	{% if query_QTL_ins_list %}
 		{% for query_QTL_ins in query_QTL_ins_list %}
 			<div class="query_sub">
 			Co-regulated genes for query_QTL:{{ query_QTL_ins.id }} Experiment: {{query_QTL_ins.exp}} Transcript: {{ query_QTL_ins.query_transcript }} Reference id: {{ query_QTL_ins.query_ref }} Marker: {{ query_QTL_ins.query_marker }} 1-LOD support interval: {{ query_QTL_ins.query_lod_si }}</br>
 			Number of co_regulated genes for query_QTL: {{ query_QTL_ins.query_trans_list|length }}</br>
+			<div class="hiddenDiv" style="display:none;">{{query_QTL_ins.exp}}</div>
 			<div>
 			{% for gene in query_QTL_ins.query_trans_list %}
 				{{ gene }},
 			{% endfor %}
+			<br/>
 			</div>
+			<div>
+				Multiple testing
+				<input type="checkbox" name = "multiple_testing" value ="bonferroni" >Bonferroni
+				<input type="checkbox" name = "multiple_testing" value ="sidak" >Sidak
+				<input type="checkbox" name = "multiple_testing" value ="holm" >Holm
+				<input type="checkbox" name = "multiple_testing" value ="fdr" >FDR
+				| control Family-wise alpha or False discovery rate at (e.g. 0.05)<input type = "text" name = "alpha" >
+			</div>
+			<button class = "go_analysis">GO enrichment analysis</button>
 			</div>	
 		{% endfor %}
 	{% endif %}
 	</div>
+	</form>
 </div>	
 {% elif candidates %}
 Query candidate genes result: </br>

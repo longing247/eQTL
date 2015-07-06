@@ -9,7 +9,7 @@ from .views import investigationView
 from django.conf import settings
 from django.conf.urls.static import static
  
-urlpatterns = patterns('',
+urlpatterns = patterns('',               
     url(r'^investigation/', investigationView),
 )+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
         

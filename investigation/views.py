@@ -7,11 +7,10 @@ from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
-from upload.models import Experiment,ArraySpot,Transcript,Marker
+from upload.models import Species,Experiment,ArraySpot,Transcript,Marker
 from usersession.models import Task
 from investigation.forms import investigationForm,investigationQTLForm,investigationTaskForm,investigationQTLTaskForm
 
-# Create your views here.
 @login_required(login_url="/login/")
 def investigationView(request):
     if request.method=='POST':
@@ -132,6 +131,7 @@ def investigationView(request):
                 target_dic_ins['target_lod_si'] = target_qtl_ins.lod_si
                 
                 exp = Experiment.objects.get(experiment_name = target_qtl_ins.experiment_id)
+                target_dic_ins['target_spec'] = exp.species
                 target_spot_list = ArraySpot.objects.filter(spot_id__in=target_gene_list,experiment_name = exp)
                 target_trans_list = Transcript.objects.filter(id__in=target_spot_list).values_list('transcript_name',flat=True)
                 target_dic_ins['target_trans_list'] = target_trans_list
@@ -157,6 +157,7 @@ def investigationView(request):
                             query_qtl_gene_list = getQTLGeneList(query_qtl,thld)
                             qtl_query_ins = Task.objects.get(id = query_qtl)
                             exp_ins = Experiment.objects.get(experiment_name = qtl_query_ins.experiment_id)
+                            query_dic_ins['query_spec'] = exp_ins.species
                             query_spot_list = ArraySpot.objects.filter(spot_id__in=query_qtl_gene_list,experiment_name = exp_ins)
                             query_trans_list = Transcript.objects.filter(spot_id__in=query_spot_list).values_list('transcript_name',flat=True)
                             
@@ -164,9 +165,11 @@ def investigationView(request):
                             
                             query_qtl_ins_list.append(query_dic_ins)
                             qtl_gene_lists.append(query_trans_list)
-                        print len(query_qtl_ins_list)
+
                         inter = intersect_mul(*qtl_gene_lists)
-                        
+                        for query in query_qtl_ins_list:
+                            if query['query_spec']!=target_dic_ins['target_spec']:
+                                raise Exception('Invalid comparison among different species')
 
                         return render(request,'investigation/investigation.html',{'intersection':inter,'target_QTL_ins':target_dic_ins,'query_QTL_ins_list':query_qtl_ins_list})
                     else:
@@ -267,9 +270,8 @@ def investigationView(request):
         else:   
             form = investigationForm()
             form1 = investigationQTLForm()
-            return render(request,'investigation/investigation.html',{'form':form,'form1':form1})
-    
-    
+            return render(request,'investigation/investigation.html',{'form':form,'form1':form1})       
+        
     
 def delimiter(st):
     delimiter_type_list = ['\t',';',' ',',','\r\n','\n']
