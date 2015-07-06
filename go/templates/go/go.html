@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'go/css/go.css' %}" type="text/css"/>
+<table>
+<tr>
+{% for col in first %}
+<th>{{ col}}</th>
+{% endfor %}
+</tr>
+{%for go in go_list %}
+<tr>
+	{% for col in go %}
+		<td>{{ col }}</td>
+	{% endfor %}
+</tr>	
+{% endfor %}
+<table>
+{% endblock %}
