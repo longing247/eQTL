@@ -1,0 +1,106 @@
+body{
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #fff;
+}
+
+.target_sub,.query_sub,#overlap{
+  padding: 8px;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  margin:10px;	
+}
+
+#invesigation{
+  float:left;
+  padding: 8px;
+  width:96%;
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: #fff;
+}
+.co_regulation_sub,.candidates_sub{
+  padding: 5px;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  margin:5px;	
+}
+
+#co_regulation{
+  display:inline-block;
+  float:left;
+  width: 40%;
+  padding: 8px;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  margin:10px;
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #fff;
+}
+#candidate_genes{
+  display: inline-block;
+  float:right;	
+  width: 40%;
+  padding: 8px;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  margin:10px;
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #fff;
+}
+.btn_analysis,.go_analysis {
+    cursor: pointer;
+    height: 25px;
+    margin-top: 25px;
+    padding: 0;
+    background: #ef4300;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    border: 1px solid #ff730e;
+    -moz-box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.25) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    -webkit-box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.25) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.25) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,.1);
+    -o-transition: all .2s;
+    -moz-transition: all .2s;
+    -webkit-transition: all .2s;
+    -ms-transition: all .2s;
+}
+
+.btn_analysis,.go_analysis:hover {
+    -moz-box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.15) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    -webkit-box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.15) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.15) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+}
+
+.btn_analysis,.go_analysis:active {
+    -moz-box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.15) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    -webkit-box-shadow:
+        0 15px 30px 0 rgba(255,255,255,.15) inset,
+        0 2px 7px 0 rgba(0,0,0,.2);
+    box-shadow:        
+        0 5px 8px 0 rgba(0,0,0,.1) inset,
+        0 1px 4px 0 rgba(0,0,0,.1);
+
+    border: 0px solid #ef4300;
