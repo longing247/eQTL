@@ -490,7 +490,10 @@ You selected Experiment: {{ experiment_name }}. LOD threshold: {% if thld %} {{ 
           d3.json("../media/data/{{ experiment_name }}/probe/" + d.spot + ".json", draw_plot);
         });
     };
-    d3.json("../media/data/{{ experiment_name }}/lod"+{{ thld }}+".json", draw);
+    var thld_ ='';
+    {% if thld %} thld_ = {{ thld }};
+    {% endif %}
+    d3.json("../media/data/{{ experiment_name }}/lod"+thld_+".json", draw);
 }).call(this);
   
 
