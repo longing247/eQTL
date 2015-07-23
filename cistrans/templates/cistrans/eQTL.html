@@ -20,7 +20,17 @@
 }
 
 </style>
+
+<script>
+$(function(){
+	$(document).tooltip();
+});
+</script>
 {% if experiment_name %}
+
+<div id = "searched_experiment">
+You selected Experiment: {{ experiment_name }}. LOD threshold: {% if thld %} {{ thld}} {% else %} LOD threshold: {{ lodthld }} (default adjusted LOD threshold using FDR control at 0.05.){% endif %}
+</div>
 
 <form action="" method="get">
 	Experiment name:
@@ -29,6 +39,7 @@
 				<option value =  "{{ experiment }}">{{ experiment }}</option>
 			{% endfor %}
 		</select>
+		LOD threshold:<input type="text" id = "thld" title ="Using default adjusted LOD threshold using FDR control at 0.05 if leaving this field blank" name = "thld" placeholder ="Optional"/>
 		<input type="submit" id="cistrans_submit" class = "btn_analysis" value="QTL plot" />
 		
 </form>
@@ -462,7 +473,7 @@
         d3.select("#marker").html("Marker:"+d.marker);
         d3.select("#lod").html("LOD:"+onedig(d.lod));
         d3.select("#lod_si").html("1-lod-si:"+d.interval);
-        d3.select("#addButton").html("<button id='btn_analysis'  class = 'btn_analysis' onclick='addQTL()'>add to task</button>");
+        d3.select("#addButton").html("<button id='btn_analysis'  class = 'btn_analysis' onclick='addQTL()'>add to invesigation</button>");
         return eqtltip.call(this, d);
       }).on("mouseout", function(d) {
         d3.selectAll("circle.probe_" + d.spot).attr("r", peakRad).attr("fill", function(d) {
@@ -479,7 +490,7 @@
           d3.json("../media/data/{{ experiment_name }}/probe/" + d.spot + ".json", draw_plot);
         });
     };
-    d3.json("../media/data/{{ experiment_name }}/lod.json", draw);
+    d3.json("../media/data/{{ experiment_name }}/lod"+{{ thld }}+".json", draw);
 }).call(this);
   
 
@@ -496,6 +507,7 @@
 					<option value =  "{{ experiment }}">{{ experiment }}</option>
 				{% endfor %}
 			</select>
+			LOD threshold:<input type="text" id = "thld" title ="Using default adjusted LOD threshold using FDR control at 0.05 if leaving this field blank" name = "thld" placeholder ="Optional"/>
 			<input type="submit" id="cistrans_submit"  class = "btn_analysis" value="QTL plot" />
 			
 	</form>

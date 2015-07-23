@@ -44,7 +44,6 @@ INSTALLED_APPS = (
     'about',
     'documentation',
     'go',
-    'south'
 )
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
@@ -92,30 +91,27 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
-#MEDIA_ROOT = '/Users/yaya/www/QTLProject/media'
-#MEDIA_ROOT = '/mnt/geninf15/prog/www/django/QTL/QTL/media' # server production
+#MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_ROOT = '/Users/yaya/www/QTLProject/media/'
+#MEDIA_ROOT = '/mnt/geninf15/prog/www/django/QTLProject/media/' # server production
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = 'media/'
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
-#STATIC_ROOT = '/mnt/geninf15/prog/www/django/QTL/qtl/static'
-STATIC_URL = '/static/'
-#STATICFILES_DIRS = (
-#                    '/mnt/geninf15/prog/www/django/QTL/qtl/static',
-#                    )
-
-
-
+#MEDIA_URL = 'http://137.224.100.212/QTLProject/media/'
+MEDIA_URL = '/media/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+STATIC_ROOT = '/Users/yaya/www/QTLProject/static/'
+#STATIC_ROOT = '/mnt/geninf15/prog/www/django/QTLProject/static/'
 STATIC_URL = '/static/'
+STATICFILES_DIRS = ('/mnt/geninf15/prog/www/django/QTLProject/static/',)
 
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 # if a user is not logged in, then it will redirect the user to login page
 
@@ -128,7 +124,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #EMAIL setting
 EMAIL_HOST = 'smtp.wur.nl'
 EMAIL_HOST_USER = 'jiao.long@wur.nl'
-EMAIL_HOST_PASSWORD = 'Gasthuisbouwing50'
+EMAIL_HOST_PASSWORD = 'Xiang12#$qwER'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'jiao.long@wur.nl'

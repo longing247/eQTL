@@ -17,11 +17,7 @@ def investigationView(request):
         if request.POST.get('exp') and request.POST.get('thld') and request.POST.get('marker'):
             if request.POST.get('gene_list') and request.POST.get('gene_list_file'):
                 raise Exception('You must choose only one, not both')
-            if not request.POST.get('gene_list') and not request.FILES.get('gene_list_file'):
-                raise Exception('You must choose only one')
             if request.POST.get('gene_list') or request.FILES.get('gene_list_file'): 
-                print request.POST.get('gene_list')
-                print request.FILES.get('gene_list_file')
                 form = investigationForm(request.POST)
                 if form.is_valid():
                     exp = request.POST.get('exp')
@@ -47,17 +43,23 @@ def investigationView(request):
                             if abs(float(line[marker_ind+1])) >= thld:
                                 lod_probe_list.append(line[0])
                         
-                    probe_list = ArraySpot.objects.filter(spot_id__in=lod_probe_list)
+                    probe_list = ArraySpot.objects.filter(spot_id__in=lod_probe_list,experiment_name=exp)
                     gene_unicode_list = Transcript.objects.filter(spot_id__in=probe_list).values_list('transcript_name',flat=True)
-                    gene_list = [ gene.encode('ascii','ignore') for gene in gene_unicode_list ]
+                    target_gene_list = [ gene.encode('ascii','ignore') for gene in gene_unicode_list ]
                         
                     
                     if request.POST.get('gene_list'):
                         raw_gene_list_string = request.POST.get('gene_list').encode('ascii','ignore')
+                        
                         delimiter_type = delimiter(raw_gene_list_string)
-                        target_gene_list = raw_gene_list_string.strip().split(delimiter_type)
-                        inter = intersect(gene_list,target_gene_list)
-                        return render(request,'investigation/investigation.html',{'intersection':inter})
+                        if delimiter!=' ':    
+                            query_gene_list = raw_gene_list_string.strip().replace(' ','').split(delimiter_type)
+                        else:
+                            query_gene_list = raw_gene_list_string.strip().split(delimiter_type)
+                        
+                        inter = intersect(target_gene_list,query_gene_list)
+                        has_inter = True
+                        return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'exp':exp,'target_gene_list':target_gene_list,'query_gene_list':query_gene_list})
                         
                             
                     if request.FILES.get('gene_list_file'):
@@ -66,10 +68,11 @@ def investigationView(request):
                         target_gene_list = []
                         content = fi.encode('ascii','ignore')
                         delimiter_type = delimiter(content)
-                        target_gene_list = content.strip().split(delimiter_type)
-    
-                        inter = intersect(gene_list,target_gene_list)
-                        return render(request,'investigation/investigation.html',{'intersection':inter})
+                        query_gene_list = content.strip().split(delimiter_type)
+                        
+                        inter = intersect(target_gene_list,target_gene_list)
+                        has_inter = True
+                        return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'exp':exp,'target_gene_list':target_gene_list,'query_gene_list':query_gene_list})
                     
         elif request.POST.get('region') and request.POST.get('exp'):
             form = investigationQTLForm(request.POST)
@@ -110,7 +113,6 @@ def investigationView(request):
         elif request.POST.get('target_sel_qtl') and request.POST.get('thld'):
             if request.POST.get('gene_list') and request.POST.get('gene_list_file'):
                 raise Exception('You must choose only one, not both')
-            
             target_qtl = request.POST.get('target_sel_qtl')
             thld = float(request.POST.get('thld'))
             form = investigationTaskForm(request.POST)
@@ -165,30 +167,36 @@ def investigationView(request):
                             
                             query_qtl_ins_list.append(query_dic_ins)
                             qtl_gene_lists.append(query_trans_list)
-
+                            
                         inter = intersect_mul(*qtl_gene_lists)
                         for query in query_qtl_ins_list:
                             if query['query_spec']!=target_dic_ins['target_spec']:
                                 raise Exception('Invalid comparison among different species')
-
-                        return render(request,'investigation/investigation.html',{'intersection':inter,'target_QTL_ins':target_dic_ins,'query_QTL_ins_list':query_qtl_ins_list})
-                    else:
-                        if request.POST.get('gene_list'):
-                            raw_gene_list_string = request.POST.get('gene_list').encode('ascii','ignore')
-                            delimiter_type = delimiter(raw_gene_list_string)
-                            query_gene_list = raw_gene_list_string.strip().split(delimiter_type)
-                            inter = intersect(target_gene_list,query_gene_list)
-                            return render(request,'investigation/investigation.html',{'intersection':inter})
-                        if request.FILES.get('gene_list_file'):
-                            fi = request.FILES.get('gene_list_file').read()
-                            target_gene_list = []
-                            content = fi.encode('ascii','ignore')
-                            delimiter_type = delimiter(content)
-                            query_gene_list = content.strip().split(delimiter_type)
-                            inter = intersect(target_gene_list,query_gene_list)
-                            return render(request,'investigation/investigation.html',{'intersection':inter})
-                        if not request.POST.get('gene_list') and not request.POST.get('gene_list_file'):
-                            raise Exception('None of query gene lists were selected.')  
+                        has_inter = True
+                        return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'target_QTL_ins':target_dic_ins,'query_QTL_ins_list':query_qtl_ins_list})
+                else:
+                    if request.POST.get('gene_list'):
+                        raw_gene_list_string = request.POST.get('gene_list').encode('ascii','ignore')
+                        delimiter_type = delimiter(raw_gene_list_string)
+                        query_gene_list = raw_gene_list_string.strip().split(delimiter_type)
+                        inter = intersect(target_gene_list,query_gene_list)
+                        has_inter = True
+                        return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'exp':exp,'target_gene_list':target_gene_list,'query_gene_list':query_gene_list})
+                    if request.FILES.get('gene_list_file'):
+                        fi = request.FILES.get('gene_list_file').read()
+                        target_gene_list = []
+                        content = fi.encode('ascii','ignore')
+                        delimiter_type = delimiter(content)
+                        query_gene_list = content.strip().split(delimiter_type)
+                        inter = intersect(target_gene_list,query_gene_list)
+                        has_inter = True
+                        if len(inter)==0:
+                            has_inter = False
+                        return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'exp':exp,'target_gene_list':target_gene_list,'query_gene_list':query_gene_list})
+                    if not request.POST.get('gene_list') and not request.POST.get('gene_list_file'):
+                        return render(request,'investigation/investigation.html',{'target_QTL_ins':target_dic_ins})
+                        
+                        
                         
         elif request.POST.get('sel_qtl'):
             form = investigationQTLTaskForm(request.POST)
@@ -274,10 +282,17 @@ def investigationView(request):
         
     
 def delimiter(st):
-    delimiter_type_list = ['\t',';',' ',',','\r\n','\n']
+    delimiter_type_list = ['\t',';',',','\r\n','\n',' ']
     for delimiter_ins in delimiter_type_list:
         if delimiter_ins in st:
             return delimiter_ins
+
+def checkSpace(st):
+    if ' ' in st:
+        return True
+    else:
+        return False
+ 
 
 def intersect(list1,list2):
     intersect_index = []
@@ -314,7 +329,6 @@ def getQTLGeneList(qtl_id,thld):
             lod_profile = line.split('\t')
             if abs(float(lod_profile[target_marker_ind])) >=thld:
                 gene_list.append(lod_profile[0])
-    print len(gene_list)
     return gene_list
 
 if __name__ == '__main__':

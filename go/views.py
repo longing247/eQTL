@@ -46,11 +46,10 @@ def GOView(request):
                 methods = [i.encode('ascii','ignore') for i in set_mul_test]
             if request.POST.get('alpha'):
                 a = request.POST.get('alpha').encode('ascii','ignore')
+
                 if a.replace('.','',1).isdigit():
                     if float(a)>0.0 or float(a)<1.0:
                         alpha = float(a)
-                        print float(a)
-            print methods,alpha
             go = GOEnrichmentStudy(pop,assoc,obo_dag,alpha = alpha, study=study,methods=methods)
             results = go.results
             header = "id enrichment description ratio_in_study ratio_in_pop p_uncorrected p_bonferroni p_holm p_sidak p_fdr".split()

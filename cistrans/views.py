@@ -1,10 +1,13 @@
 import json
+import os
 
 from django.shortcuts import render,render_to_response,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from upload.models import ArraySpot,Experiment,Transcript,Marker
+from upload.views import outputJson
 from usersession.models import Task
 # Create your views here.
 @login_required(login_url="/login/")
@@ -19,11 +22,30 @@ def eQTLPlotView(request):
             exp_name = request.GET.get('experiment_name')
             user_ = User.objects.get(username = request.user)
             user_tasks = Task.objects.filter(user_name=user_).values('id','experiment','probe','marker')
-
-            return render_to_response('cistrans/eQTL.html',{'experiment_name': exp_name,
-                                                            'experiments':experiments,
-                                                            'task_list':user_tasks,
-                                                            'user':request.user})
+            if request.GET.get('thld'):
+                qtl_file = 'lod.txt'
+                try:
+                    thld = float(request.GET.get('thld'))
+                    output = 'lod%s.json' % request.GET.get('thld').encode('ascii','ignore')
+                    if not os.path.isfile(os.path.join(settings.MEDIA_ROOT,'data','%s' % exp_name,output)):
+                        outputJson(exp_name,qtl_file,thld,output)
+                    return render_to_response('cistrans/eQTL.html',{'experiment_name':exp_name,
+                                                                    'experiments':experiments,
+                                                                    'task_list':user_tasks,
+                                                                    'user':request.user,
+                                                                    'thld':request.GET.get('thld')}) 
+                except ValueError:
+                    return HttpResponse('<h1> invalid LOD threshold </h1>')
+            else:
+                
+                user_ = User.objects.get(username = request.user)
+                user_tasks = Task.objects.filter(user_name=user_).values('id','experiment','probe','marker')
+                lodthld = Experiment.objects.get(experiment_name = exp_name).lodthld
+                return render_to_response('cistrans/eQTL.html',{'experiment_name': exp_name,
+                                                                'experiments':experiments,
+                                                                'task_list':user_tasks,
+                                                                'user':request.user,
+                                                                'lodthld':lodthld})
         else:
             user_ = User.objects.get(username = request.user)
             user_tasks = Task.objects.filter(user_name=user_).values('id','experiment','probe','marker')         
