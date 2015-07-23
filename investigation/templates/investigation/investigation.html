@@ -16,7 +16,7 @@
 	<div class="hiddenDiv" style="display:none;">{{target_QTL_ins.exp}}</div>
 	<div>
 	{% for inter in intersection %}
-		{{ inter }},
+		{{ inter }}
 	{% endfor %}
 	</br>
 	</div>
@@ -45,7 +45,7 @@
 			<div class="hiddenDiv" style="display:none;">{{target_QTL_ins.exp}}</div>
 			<div>
 			{% for gene in target_QTL_ins.target_trans_list %}
-				{{ gene }},
+				{{ gene }}
 			{% endfor %}
 			<br />
 			</div>
@@ -68,7 +68,7 @@
 			<div class="hiddenDiv" style="display:none;">{{exp}}</div>
 			<div>
 			{% for gene in target_gene_list %}
-				{{ gene }},
+				{{ gene }}
 			{% endfor %}
 			<br />
 			</div>
@@ -95,7 +95,7 @@
 			<div class="hiddenDiv" style="display:none;">{{query_QTL_ins.exp}}</div>
 			<div>
 			{% for gene in query_QTL_ins.query_trans_list %}
-				{{ gene }},
+				{{ gene }}
 			{% endfor %}
 			<br/>
 			</div>
@@ -119,7 +119,7 @@
 		<div class="hiddenDiv" style="display:none;">{{exp}}</div>
 		<div>
 		{% for gene in query_gene_list %}
-			{{ gene }},
+			{{ gene }} 
 		{% endfor %}
 		<br/>
 		</div>
@@ -150,7 +150,7 @@
 		<div class="hiddenDiv" style="display:none;">{{target_QTL_ins.exp}}</div>
 		<div>
 		{% for gene in target_QTL_ins.target_trans_list %}
-			{{ gene }},
+			{{ gene }} 
 		{% endfor %}
 		<br />
 		</div>
@@ -167,12 +167,33 @@
 	</div>
 	</form>
 </div>
-{% elif candidates %}
-Query candidate genes result: </br>
+{% elif target_candidates %}
 
+{% if candidates %}
+<div id = 'overlap_candidates' class='candidate_genes'>
+Overlap candidates ({{ candidates|length}}):</br>
 {% for candidate in candidates %}
-	{{ candidate }} </br>
+	{{ candidate }}
 {% endfor %}
+</div>
+{% endif %}
+
+<div id = 'target_candidates' class='candidate_genes'>
+Target candidate genes ({{ target_candidates|length}}) {% if lod_si %} 1.5 LOD support interval {{ lod_si }}{% endif %}: </br>
+
+{% for candidate in target_candidates %}
+	{{ candidate }}
+{% endfor %}
+</div>
+
+{% if query_candidates %}
+<div id = 'query_candidates' class='candidate_genes'>
+Query candidate genes ({{ query_candidates|length}}):</br>
+{% for candidate in query_candidates %}
+	{{ candidate }}
+{% endfor %}
+</div>
+{% endif %}
 
 {% else %}
 
@@ -218,15 +239,16 @@ Query candidate genes result: </br>
 	<form action="" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
 		<div class = 'candidates_sub'>
-			<h2> Target candidate gene list for a QTL</h2>
+			<h2> Target candidate genes underlying QTL</h2>
 			<div>Target QTL:<select class = "qtl_analysis" name = "sel_qtl">{% for task in tasks %}<option value =  "{{ task.id }}">QTL {{ task.id }}</option>{% endfor %}</select></div>
+			<input type="submit" id="candidates_submit" class="btn_analysis" value="candidate genes" />
 		</div>
 		<div class = 'candidates_sub'>
 			<h2> Query gene list</h2>
 			<div>compare with your gene list: {{ form1.qtl_gene_list }}</div>
 			<div>or a file contains: {{ form1.qtl_gene_list_file }} </div>
 		</div>
-		<input type="submit" id="candidates_submit" class="btn_analysis" value="candidate genes selection" />
+		<input type="submit" id="candidates_submit" class="btn_analysis" value="candidate genes comparision" />
 		
 </form>
 </div>

@@ -52,10 +52,8 @@ def investigationView(request):
                         raw_gene_list_string = request.POST.get('gene_list').encode('ascii','ignore')
                         
                         delimiter_type = delimiter(raw_gene_list_string)
-                        if delimiter!=' ':    
-                            query_gene_list = raw_gene_list_string.strip().replace(' ','').split(delimiter_type)
-                        else:
-                            query_gene_list = raw_gene_list_string.strip().split(delimiter_type)
+                        
+                        query_gene_list = raw_gene_list_string.strip().split(delimiter_type)
                         
                         inter = intersect(target_gene_list,query_gene_list)
                         has_inter = True
@@ -73,42 +71,6 @@ def investigationView(request):
                         inter = intersect(target_gene_list,target_gene_list)
                         has_inter = True
                         return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'exp':exp,'target_gene_list':target_gene_list,'query_gene_list':query_gene_list})
-                    
-        elif request.POST.get('region') and request.POST.get('exp'):
-            form = investigationQTLForm(request.POST)
-            if form.is_valid():
-                region = request.POST.get('region').strip().encode('ascii','ignore')
-                regex_for_chr = re.compile('([0-9]{1,2}|X|CP|MT)\s*(:)?\s*')
-                regex_for_start_end = re.compile('(\d+)\s*(-)?\s*(\d+)\s*')
-                chr_ = re.search(regex_for_chr,region).group().replace(' ','').replace(':','')
-                start_,end_ = re.search(regex_for_start_end,region).group().replace(' ','').split('-')
-                
-                exp_ = request.POST.get('exp').strip().encode('ascii','ignore')
-                
-                experiment = Experiment.objects.get(experiment_name = exp_)
-                probes = ArraySpot.objects.filter(experiment_name = experiment)
-                candidates = Transcript.objects.filter(spot_id__in = probes,chr=chr_,start__gte=start_,end__lte=end_).order_by('start').values_list('transcript_name',flat=True)
-                query_candidates = [ candidate.encode('ascii','ignore' ) for candidate in candidates]
-                
-                
-                if request.POST.get('qtl_gene_list') and request.POST.get('qtl_gene_list_file'):
-                    raise Exception('You must choose only one, not both')
-                if request.POST.get('qtl_gene_list'):
-                    raw_gene_list_string = request.POST.get('qtl_gene_list').encode('ascii','ignore')
-                    delimiter_type = delimiter(raw_gene_list_string)
-                    target_gene_list = raw_gene_list_string.strip().split(delimiter_type)
-                    candidates = intersect(query_candidates,target_gene_list)
-                    return render(request,'investigation/investigation.html',{'candidates':candidates})
-               
-                if request.FILES.get('qtl_gene_list_file'):
-                            fi = request.FILES.get('qtl_gene_list_file').read()
-                            target_gene_list = []
-                            content = fi.encode('ascii','ignore')
-                            delimiter_type = delimiter(content)
-                            target_gene_list = content.strip().split(delimiter_type)
-        
-                            candidates = intersect(query_candidates,target_gene_list)
-                            return render(request,'investigation/investigation.html',{'candidates':candidates})   
                          
         elif request.POST.get('target_sel_qtl') and request.POST.get('thld'):
             if request.POST.get('gene_list') and request.POST.get('gene_list_file'):
@@ -195,9 +157,51 @@ def investigationView(request):
                         return render(request,'investigation/investigation.html',{'has_inter':has_inter,'intersection':inter,'exp':exp,'target_gene_list':target_gene_list,'query_gene_list':query_gene_list})
                     if not request.POST.get('gene_list') and not request.POST.get('gene_list_file'):
                         return render(request,'investigation/investigation.html',{'target_QTL_ins':target_dic_ins})
+        
+        #without pre-selected QTL instances.
+        elif request.POST.get('region') and request.POST.get('exp'):
+            form = investigationQTLForm(request.POST)
+            if form.is_valid():
+                region = request.POST.get('region').strip().encode('ascii','ignore')
+                regex_for_chr = re.compile('([0-9]{1,2}|X|CP|MT)\s*(:)?\s*')
+                regex_for_start_end = re.compile('(\d+)\s*(-)?\s*(\d+)\s*')
+                chr_ = re.search(regex_for_chr,region).group().replace(' ','').replace(':','')
+                start_,end_ = re.search(regex_for_start_end,region).group().replace(' ','').split('-')
+                
+                exp_ = request.POST.get('exp').strip().encode('ascii','ignore')
+                
+                experiment = Experiment.objects.get(experiment_name = exp_)
+                probes = ArraySpot.objects.filter(experiment_name = experiment)
+                target_candidates = Transcript.objects.filter(spot_id__in = probes,chr=chr_,start__gte=start_,end__lte=end_).order_by('start').values_list('transcript_name',flat=True)
+                target_candidates = list(set([ candidate.encode('ascii','ignore' ) for candidate in target_candidates]))
+                
+                
+                if request.POST.get('qtl_gene_list') and request.POST.get('qtl_gene_list_file'):
+                    raise Exception('You must choose only one, not both')
+                
+                if request.POST.get('qtl_gene_list') or request.POST.get('qtl_gene_list_file'):
+                    if request.POST.get('qtl_gene_list'):
+                            raw_gene_list_string = request.POST.get('qtl_gene_list').encode('ascii','ignore')
+                            delimiter_type = delimiter(raw_gene_list_string)
+                            query_candidates = list(set(raw_gene_list_string.strip().split(delimiter_type)))
+                            candidates = intersect(target_candidates,query_candidates)
+                            return render(request,'investigation/investigation.html',{'target_candidates':target_candidates,
+                                                                                      'query_candidates': query_candidates,
+                                                                                      'candidates':candidates})
+                    if request.FILES.get('qtl_gene_list_file'):
+                            fi = request.FILES.get('qtl_gene_list_file').read()
+                            target_gene_list = []
+                            content = fi.encode('ascii','ignore')
+                            delimiter_type = delimiter(content)
+                            query_candidates = list(set(content.strip().split(delimiter_type)))
+                            candidates = intersect(target_candidates,query_candidates)
+                            return render(request,'investigation/investigation.html',{'target_candidates':target_candidates,
+                                                                                      'query_candidates': query_candidates,
+                                                                                      'candidates':candidates})
+                else:
+                    return render(request,'investigation/investigation.html',{'target_candidates':target_candidates})             
                         
-                        
-                        
+        #with pre-selected QTL instace                
         elif request.POST.get('sel_qtl'):
             form = investigationQTLTaskForm(request.POST)
             if form.is_valid():
@@ -211,48 +215,40 @@ def investigationView(request):
                 start_,end_ = re.search(regex_for_start_end,region).group().replace(' ','').split('-')
                 
                 exp_ = Task.objects.get(id=qtl_id).experiment_id.encode('ascii','ignore')
+                lod_si_ = Task.objects.get(id=qtl_id).lod_si
                 
                 experiment = Experiment.objects.get(experiment_name = exp_)
                 probes = ArraySpot.objects.filter(experiment_name = experiment)
                 target_candidates = Transcript.objects.filter(spot_id__in = probes,chr=chr_,start__gte=start_,end__lte=end_).order_by('start').values_list('transcript_name',flat=True)
-                target_candidates = [ candidate.encode('ascii','ignore' ) for candidate in target_candidates]
-                qtl_list_candidates.append(target_candidates)
+                target_candidates = list(set([ candidate.encode('ascii','ignore' ) for candidate in target_candidates]))
                 if request.POST.get('qtl_gene_list') and request.POST.get('qtl_gene_list_file'):
                     raise Exception('You must choose only one, not both')
                 
-                if request.POST.getlist('query_qtls'):
-                    query_qtls = request.POST.getlist('query_qtls')
-                   
-                    if len(query_qtls)!=0:
-                        for qtl in query_qtls:
-                            query_region = Task.objects.get(id=qtl).lod_si.encode('ascii','ignore')
-                            query_chr_ = re.search(regex_for_chr,query_region).group().replace(' ','').replace(':','')
-                            query_start_,query_end_ = re.search(regex_for_start_end,query_region).group().replace(' ','').split('-')
-                            
-                            query_exp_ = Task.objects.get(id=qtl).experiment_id.encode('ascii','ignore')
-                            query_experiment = Experiment.objects.get(experiment_name = query_exp_)
-                            query_probes = ArraySpot.objects.filter(experiment_name = query_experiment)
-                            query_candidates = Transcript.objects.filter(spot_id__in = query_probes,chr=chr_,start__gte=start_,end__lte=end_).order_by('start').values_list('transcript_name',flat=True)
-                            query_candidates = [ candidate.encode('ascii','ignore' ) for candidate in target_candidates]
-                            qtl_list_candidates.append(query_candidates)
-                            candidates = intersect_mul(*qtl_list_candidates)
-                            return render(request,'investigation/investigation.html',{'candidates':candidates}) 
-                    else:  
-                        if request.POST.get('qtl_gene_list'):
+                
+                if request.POST.get('qtl_gene_list') or request.POST.get('qtl_gene_list_file'):
+                    if request.POST.get('qtl_gene_list'):
                             raw_gene_list_string = request.POST.get('qtl_gene_list').encode('ascii','ignore')
                             delimiter_type = delimiter(raw_gene_list_string)
-                            query_candidates = raw_gene_list_string.strip().split(delimiter_type)
+                            query_candidates = list(set(raw_gene_list_string.strip().split(delimiter_type)))
                             candidates = intersect(target_candidates,query_candidates)
-                            return render(request,'investigation/investigation.html',{'candidates':candidates})
-                       
-                        if request.FILES.get('qtl_gene_list_file'):
+                            return render(request,'investigation/investigation.html',{'target_candidates':target_candidates,
+                                                                                      'lod_si':lod_si_,
+                                                                                      'query_candidates': query_candidates,
+                                                                                      'candidates':candidates})
+                    if request.FILES.get('qtl_gene_list_file'):
                             fi = request.FILES.get('qtl_gene_list_file').read()
                             target_gene_list = []
                             content = fi.encode('ascii','ignore')
                             delimiter_type = delimiter(content)
-                            query_candidates = content.strip().split(delimiter_type)
+                            query_candidates = list(set(content.strip().split(delimiter_type)))
                             candidates = intersect(target_candidates,query_candidates)
-                            return render(request,'investigation/investigation.html',{'candidates':candidates})   
+                            return render(request,'investigation/investigation.html',{'target_candidates':target_candidates,
+                                                                                      'lod_si':lod_si_,
+                                                                                      'query_candidates': query_candidates,
+                                                                                      'candidates':candidates})
+                else:
+                    return render(request,'investigation/investigation.html',{'target_candidates':target_candidates,
+                                                                              'lod_si':lod_si_})   
             
     else:
         if request.GET.getlist('QTL_list'):
