@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'about',
     'documentation',
     'go',
+    'browser',
 )
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]

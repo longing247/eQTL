@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load staticfiles %}
+
+<script type="text/javascript" language = "javascript" class = "init">
+$(document).ready(function(){
+	$(document).tooltip();
+});
+</script>
+
+<form action="" method="get">
+	Search for:
+		<select id='search_type' name = 'search_type'>
+				<option value =  "gene">Gene</option>
+				<option value =  "marker">Marker</option>
+				<option value =  "genes">All genes in experiment</option>
+				<option value =  "markers">All markers in experiment</option>
+		</select>
+		<input type="text" id = "search" title ="e.g. AT1G01010" name = "search" placeholder ="AT1G01010 in Gene search"/>
+		<input type="submit" id="submit"  class = "submit" value="Search" />
+		
+</form>
+
+{% if gene %}
+	<table id="table_ins" class = "display" cellspacing = "0" width = "60">
+		<thead>
+			<tr>
+				<th align="center">Transcript</th>
+				<th align="center">Chromosome</th>
+				<th align="center">Start (bp) </th>
+				<th align="center">End (bp)</th>
+				<th align="center">Source link</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td align="center">{{ gene.transcript_name }}</td>
+				<td align="center">{{ gene.chr }}</td>
+				<td align="center">{{ gene.start }}</td>
+				<td align="center">{{ gene.end }}</td>
+				<td align="center"><a href = "{{ link }}{{ gene.ref_id }}">{{ gene.ref_id }}</a></td>
+			</tr>
+	</tbody>
+{% endif %}
+{% if marker %}
+	<table id="table_ins" class = "display" cellspacing = "0" width = "60">
+		<thead>
+			<tr>
+				<th align="center">Marker</th>
+				<th align="center">Chromosome</th>
+				<th align="center">Start (bp) </th>
+				<th align="center">End (bp) </th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td align="center">{{ marker.marker_name }}</td>
+				<td align="center">{{ marker.marker_chr }}</td>
+				<td align="center">{{ marker.marker_start }}</td>
+				<td align="center">{{ marker.marker_end }}</td>
+			</tr>
+	</tbody>
+{% endif %}
+
+{% if genes %}
+<table id="table_ins" class = "display" cellspacing = "0" width = "60">
+		<thead>
+			<tr>
+				<th align="center">Transcript</th>
+				<th align="center">Chromosome</th>
+				<th align="center">Start (bp) </th>
+				<th align="center">End (bp) </th>
+				<th align="center">Source link</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for gene in genes %}
+			<tr>
+				<td align="center">{{ gene.transcript_name }}</td>
+				<td align="center">{{ gene.chr }}</td>
+				<td align="center">{{ gene.start }}</td>
+				<td align="center">{{ gene.end }}</td>
+				<td align="center"><a href = "{{ link }}{{ gene.ref_id }}">{{ gene.ref_id }}</a></td>
+			</tr>
+			{% endfor %}
+	</tbody>
+{% endif %}
+
+{% if markers %}
+	<table id="table_ins" class = "display" cellspacing = "0" width = "60">
+		<thead>
+			<tr>
+				<th align="center">Marker</th>
+				<th align="center">Chromosome</th>
+				<th align="center">Start (bp) </th>
+				<th align="center">End (bp) </th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for marker in markers %}
+			<tr>
+				<td align="center">{{ marker.marker_name }}</td>
+				<td align="center">{{ marker.marker_chr }}</td>
+				<td align="center">{{ marker.marker_start }}</td>
+				<td align="center">{{ marker.marker_end }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+{% endif %}
+
+
+{% endblock %}

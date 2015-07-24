@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^', include('documentation.urls')),
     url(r'^', include('about.urls')), 
     url(r'^', include('go.urls')),  
+    url(r'^', include('browser.urls')),  
     url(r'^admin/', include(admin.site.urls)),
     #url(r'^$', indexView,name='index'),
 

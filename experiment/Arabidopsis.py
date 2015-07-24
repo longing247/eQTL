@@ -25,10 +25,13 @@ class Arabidopsis:
                         'cp':{'start': 0, 'end': 154478},
                         'mt':{'start': 0, 'end': 366924}
                         } 
+        self.link_pre = 'http://plants.ensembl.org/Arabidopsis_thaliana/Gene/Summary?g='
      #http://www.nature.com/ng/journal/v15/n1/abs/ng0197-57.html   
      #The mitochondrial genome of Arabidopsis thaliana contains 57 genes in 366,924 nucleotides   
     def getChr(self):
         return self.chr
     def getChrLen(self):
         return self.chr_len
+    def getLink(self):
+        return self.link_pre
     
